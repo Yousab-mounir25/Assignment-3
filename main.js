@@ -46,10 +46,9 @@ app.patch('/user/:id' , (req,res,next)=>{
 
         }else{
             let users = JSON.parse(data)
-            const idExist = users.find(ele=> ele.id == Number(id))
+            const idExist = users.find(ele=> ele.id == Number(id))     //// [{name ,age ,email}]
             if(!idExist){
                 return res.status(400).json({message:"ID not exist"})
-
             }else{
                 if(name){
                     idExist.name = name
@@ -77,7 +76,7 @@ app.patch('/user/:id' , (req,res,next)=>{
 
 //(3)delete user
 app.delete('/user/:id' , (req,res,next)=>{
-    const {id} = req.params;
+    const { id } = req.params;
 
     fs.readFile(usersFile , "utf-8", (error,data)=>{
         if(error){
@@ -109,29 +108,74 @@ app.get('/user/getByName', (req, res, next) => {
 
     const { name } = req.query;
     fs.readFile(usersFile, "utf-8", (error, data) => {
-
         if (error) {
-            return res.status(500).json({
-                message: "Failed to fetch the file"
-            });
+            return res.status(500).json({ message: "Failed to fetch the file"});
         }
 
         let users = JSON.parse(data);
-
         const userExist = users.find(ele => ele.name == name);
 
         if (!userExist) {
-            return res.status(404).json({
-                message: "User name not found."
-            });
+            return res.status(404).json({  message: "User name not found." });
         }
-
         return res.status(200).json(userExist);
 
     });
 
 });
+
+
+//(5) get all users 
+
+app.get('/users' , (req,res,next)=>{
+    fs.readFile(usersFile , "utf-8" , (error,data)=>{
+        if(error){
+            return res.status(500).json({message:"Failed to fetch the file"})
+        }else{
+            let users = JSON.parse(data)
+            return res.status(200).json({users:users})
+        }
     
+    })
+})
+
+//(6)filter users by minimum age
+app.get('/user/filter' , (req,res,next)=>{
+    const { minAge } = req.query
+    fs.readFile(usersFile , "utf-8" , (error , data)=>{
+        if(error){
+            return res.status(500).json({message:"Failed to fetch the file"})
+        }else{
+            let users = JSON.parse(data)
+            const userAges = users.filter((ele)=> ele.age >= Number(minAge))
+            if(userAges.length==0){
+                return res.status(404).json({message:`not ages found greater than or equal the age ${Number(minAge)}`})
+            }else{
+                res.status(200).json({users:userAges})
+            }
+        }
+    })
+})
+    
+
+//(7) get user by id
+app.get('/user/:id' , (req,res,next)=>{
+    const {id} = req.params;
+    fs.readFile(usersFile , "utf-8" , (error ,data)=>{
+        if(error){
+            return res.status(500).json({message:"Failed to fetch the file"})
+        }else{
+            let users = JSON.parse(data)
+            //check if id exist
+            const userIdExist = users.find(ele=> ele.id == Number(id))
+            if(!userIdExist){
+                return res.status(404).json({message:"ID not found"})
+            }else{
+                return res.status(200).json({user : userIdExist})
+            }
+        }
+    })
+})
 
 
 
