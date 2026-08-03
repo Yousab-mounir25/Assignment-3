@@ -46,7 +46,7 @@ app.patch('/user/:id' , (req,res,next)=>{
 
         }else{
             let users = JSON.parse(data)
-            const idExist = users.find(ele=> ele.id == Number(id))     //// [{name ,age ,email}]
+            const idExist = users.find(ele=> ele.id == Number(id))     //// [{name ,age ,email}] or undefind(false)
             if(!idExist){
                 return res.status(400).json({message:"ID not exist"})
             }else{
@@ -75,8 +75,8 @@ app.patch('/user/:id' , (req,res,next)=>{
 
 
 //(3)delete user
-app.delete('/user/:id' , (req,res,next)=>{
-    const { id } = req.params;
+app.delete('/user{/:id}' , (req,res,next)=>{
+    const  id  = req.params.id || req.body.id;  // take the id from the params or body 
 
     fs.readFile(usersFile , "utf-8", (error,data)=>{
         if(error){
@@ -176,7 +176,6 @@ app.get('/user/:id' , (req,res,next)=>{
         }
     })
 })
-
 
 
 
